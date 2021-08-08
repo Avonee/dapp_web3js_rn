@@ -18,7 +18,8 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  Dimensions
+  Dimensions,
+  Image
 } from 'react-native';
 
 import {
@@ -29,8 +30,15 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+
 import './shim'
-import Web3 from 'web3';
+
+import Portfolio from './src/PortfolioScreen';
+import TransactionHistory from './src/TransactionHistory';
+import Send from './src/SendScreen';
 
 const Section = ({ children, title }): Node => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -59,148 +67,82 @@ const Section = ({ children, title }): Node => {
 };
 
 const App: () => Node = () => {
-  const DEFAULT_WIDTH = Dimensions.get('window').width
-  const project_id = 'c4b99fb495c649eb941a34d91d8d7bd2'
-  // const link = 'https://mainnet.infura.io/'
-  const link = `https://ropsten.infura.io/v3/${project_id}`
-  const localhost_address = 'http://127.0.0.1:8545'//'http://localhost:8545'
-  const web3 = new Web3(
-    new Web3.providers.HttpProvider(link)
-  );
-
-  const [address, setAddress] = useState("")
-  const [myPrivateKey, setMyPrivateKey] = useState("")
-  const [balance, setBalance] = useState(0);
-  const [otherAddress, setOtherAddress] = useState("");
-  const [value, setValue] = useState(0);
-  const [hash, setHash] = useState("");
-
-
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const createWallet = () => {
-    let web3 = new Web3(Web3.givenProvider || new Web3.providers.HttpProvider(link));
-    const newWallet = web3.eth.accounts.wallet.create(1);
-    const newAccount = newWallet[0];
-    // console.log("newAccount????", newAccount);
 
-    setAddress(newAccount.address)
-    setMyPrivateKey(newAccount.privateKey)
+  const Tab = createBottomTabNavigator();
+  const Stack = createStackNavigator();
+
+  function portfolioStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName='Portfolio'
+        headerMode='none'
+        screenOptions={{
+          headerStyle: { backgroundColor: '#00cccc' },
+          headerTintColor: 'white',
+          headerBackTitle: '返回'
+        }}
+      >
+        <Stack.Screen name="Portfolio" component={Portfolio} />
+        <Stack.Screen name="TransactionHistory" component={TransactionHistory} />
+      </Stack.Navigator>
+    )
   }
 
-  const walletBalance = () => {
-    web3.eth.getBalance(address).then((result) => {
-      setBalance(Web3.utils.fromWei(result, 'ether'));
-    })
+  function sendStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName='Send'
+        headerMode='none'
+        screenOptions={{
+          headerStyle: { backgroundColor: '#00cccc' },
+          headerTintColor: 'white',
+          headerBackTitle: '返回'
+        }}
+      >
+        <Stack.Screen name="Send" component={Send} />
+      </Stack.Navigator>
+    )
   }
 
-  const transferEth = () => {
-    // const Tx = require('ethereumjs-tx').Transaction
-    // const privateKey = Buffer.from(myPrivateKey, 'hex');
-    // web3.eth.getTransactionCount(address).then(_nonce => {
-
-    //   console.log("value: " + value);
-    //   console.log("text: " + otherAddress);
-
-    //   const money = web3.utils.toWei(value.toString(), 'ether')
-    //   console.log("money: " + money);
-    //   console.log("hexmoney: " + web3.utils.toHex(money));
-
-    //   const txParams = {
-    //     gasPrice: web3.utils.toHex(20000000000),
-    //     gasLimit: web3.utils.toHex(2300000),
-    //     to: otherAddress,
-    //     from: address,
-    //     nonce: web3.utils.toHex((_nonce)),
-    //     value: web3.utils.toHex(money)
-    //   };
-
-    //   const tx = new Tx(txParams, { 'chain': 'ropsten' });
-
-    //   tx.sign(privateKey); // Transaction Signing here
-
-    //   const serializedTx = tx.serialize();
-
-    //   web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).then((result) => {
-    //     console.log(result);
-    //     setHash(result.transactionHash);
-
-    //   })
-
-    //   walletBalance()
-
-    // })
-  }
-
-  useEffect(() => {
-    address == "" ? null : walletBalance()
-  })
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        {/* <Header /> */}
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
 
+    <NavigationContainer>
 
-          <Section title="My Wallet">
-            {/* Edit <Text style={styles.highlight}>App.js</Text> to change this
-              screen and then come back to see your edits. */}
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color }) => {
+            let iconUri;
+            if (route.name == 'Transaction') {
+              iconUri = 'https://cdn.iconscout.com/icon/premium/png-512-thumb/wallet-224-207902.png';
+            }
+            else if (route.name == 'Portfolio') {
+              iconUri = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJDn0ojTITvcdAzMsfBMJaZC4STaDHzduleQ&usqp=CAU';
 
-            <Text>Address : {address === "" ? "no account" : address}</Text>
+            }
+            return <Image source={{ uri: iconUri }} style={{ width: 25, height: 25 }} />
+          },
+          tabBarActiveTintColor: '#00cccc',
+          tabBarInactiveTintColor: 'gray',
+          tabBarStyle: [
+            {
+              display: 'flex'
+            }
+          ]
 
-          </Section>
+        })}
+      >
+        <Tab.Screen name="Portfolio" component={portfolioStack} />
+        <Tab.Screen name="Send" component={sendStack} />
+      </Tab.Navigator>
+    </NavigationContainer>
 
-          <TouchableOpacity onPress={() => createWallet()} style={{
-            width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: '#00cccc',
-            flexDirection: "row", flex: 1,
-            left: DEFAULT_WIDTH * 0.8,// DEFAULT_WIDTH * 0.61,
-            right: 0,
-            justifyContent: 'center',//'space-between',
-            marginBottom: 70,
-            marginTop: -100,
-
-          }}>
-            <Text style={[styles.buttonText, { color: '#00cccc' }]}>+</Text>
-          </TouchableOpacity>
-
-          <Section title="Wallet Balance">
-            <Text style={styles.text}> {address === "" ? "no account" : balance + " ETH"}</Text>
-          </Section>
-
-          <Section title="Transaction">
-            <Text style={styles.text}>Network Fee</Text>
-            {/* choose high low  */}
-          </Section>
-          <TextInput style={styles.inputText} placeholder="Recipient address" onChangeText={(otherAddress) => { setOtherAddress(otherAddress) }}></TextInput>
-          <TextInput style={styles.inputText} placeholder="Amount" onChangeText={(value) => { setValue(value) }}></TextInput>
-          <TouchableOpacity style={[styles.sendButton, { marginLeft: 30 }]} onPress={() => { transferEth() }}>
-            <Text style={styles.buttonText}>交易ETH</Text>
-          </TouchableOpacity>
-          {hash !== '' ? <Text style={styles.text}>交易hash值：{hash}</Text> : <Text></Text>}
-
-
-          {/* 
-            <Section title="Debug">
-              <DebugInstructions />
-            </Section>
-            <Section title="Learn More">
-              Read the docs to discover what to do next:
-            </Section>
-            <LearnMoreLinks /> */}
-        </View>
-      </ScrollView>
-    </SafeAreaView >
   );
 };
 
@@ -221,30 +163,6 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
-  inputText: {
-    width: 350,
-    height: 40,
-    textAlign: 'center',
-    color: 'black',
-    borderColor: '#00cccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    margin: 10,
-    marginLeft: 30
-  },
-  sendButton: {
-    width: 350,
-    height: 40,
-    backgroundColor: '#00cccc',
-    borderRadius: 10,
-    marginTop: 10,
-    justifyContent: 'center'
-  },
-  buttonText: {
-    textAlign: 'center',
-    fontSize: 20,
-    color: 'white'
-  }
 });
 
 export default App;
