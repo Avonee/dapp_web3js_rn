@@ -1,0 +1,6 @@
+module Pods_dapp_web3js_rn_dapp_web3js_rnTests {
+  umbrella header "Pods-dapp_web3js_rn-dapp_web3js_rnTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

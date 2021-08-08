@@ -1,0 +1,6 @@
+module Pods_dapp_web3js_rn {
+  umbrella header "Pods-dapp_web3js_rn-umbrella.h"
+
+  export *
+  module * { export * }
+}
