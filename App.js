@@ -81,11 +81,12 @@ const App: () => Node = () => {
     return (
       <Stack.Navigator
         initialRouteName='Portfolio'
-        headerMode='none'
+        // headerMode='none'
         screenOptions={{
           headerStyle: { backgroundColor: '#00cccc' },
           headerTintColor: 'white',
-          headerBackTitle: '返回'
+          headerBackTitle: '',
+          // headerShown: false
         }}
       >
         <Stack.Screen name="Portfolio" component={Portfolio} />
@@ -98,11 +99,11 @@ const App: () => Node = () => {
     return (
       <Stack.Navigator
         initialRouteName='Send'
-        headerMode='none'
         screenOptions={{
           headerStyle: { backgroundColor: '#00cccc' },
           headerTintColor: 'white',
-          headerBackTitle: '返回'
+          headerBackTitle: '返回',
+          headerShown: false
         }}
       >
         <Stack.Screen name="Send" component={Send} />

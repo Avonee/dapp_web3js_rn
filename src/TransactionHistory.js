@@ -80,8 +80,8 @@ const TransactionHistory: () => Node = () => {
                         backgroundColor: isDarkMode ? Colors.black : Colors.white,
                     }}>
 
-                    <Section title="Debug">
-                        <DebugInstructions />
+                    <Section title="History">
+                        {/* <DebugInstructions /> */}
                     </Section>
 
 

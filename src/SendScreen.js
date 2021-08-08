@@ -32,6 +32,8 @@ import {
 import '../shim'
 import Web3 from 'web3';
 
+import * as StorageHelper from '../helpers/StorageHelpers'
+
 const Section = ({ children, title }): Node => {
     const isDarkMode = useColorScheme() === 'dark';
     return (
@@ -58,7 +60,7 @@ const Section = ({ children, title }): Node => {
     );
 };
 
-const Send: () => Node = () => {
+const Send: () => Node = (props) => {
     const DEFAULT_WIDTH = Dimensions.get('window').width
     const project_id = 'c4b99fb495c649eb941a34d91d8d7bd2'
     // const link = 'https://mainnet.infura.io/'
@@ -81,6 +83,18 @@ const Send: () => Node = () => {
     const backgroundStyle = {
         backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     };
+
+    const loadStorage = async () => {
+        let user_accountGet = await StorageHelper.getMySetting('user_account')
+        let user_privatekeyGet = await StorageHelper.getMySetting('user_privatekey')
+
+        if (user_accountGet || (user_accountGet !== '')) {
+            setAddress(user_accountGet)
+            setMyPrivateKey(user_privatekeyGet)
+        }
+
+        console.log("拿到？", user_accountGet)
+    }
 
     const walletBalance = () => {
         web3.eth.getBalance(address).then((result) => {
@@ -127,8 +141,16 @@ const Send: () => Node = () => {
     }
 
     useEffect(() => {
-        address == "" ? null : walletBalance()
-    })
+        const unsubscribe = props.navigation.addListener('focus', async () => {
+            console.log("!!!!!!!!!")
+            loadStorage()
+            address == "" ? null : walletBalance()
+        })
+
+        return () => {
+            unsubscribe
+        }
+    }, [address])
 
     return (
         <SafeAreaView style={backgroundStyle}>

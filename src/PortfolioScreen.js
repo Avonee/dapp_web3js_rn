@@ -32,6 +32,8 @@ import {
 import '../shim'
 import Web3 from 'web3';
 
+import * as StorageHelper from '../helpers/StorageHelpers'
+
 const Section = ({ children, title }): Node => {
     const isDarkMode = useColorScheme() === 'dark';
     return (
@@ -58,7 +60,7 @@ const Section = ({ children, title }): Node => {
     );
 };
 
-const Portfolio: () => Node = () => {
+const Portfolio: () => Node = (props) => {
     const DEFAULT_WIDTH = Dimensions.get('window').width
     const project_id = 'c4b99fb495c649eb941a34d91d8d7bd2'
     // const link = 'https://mainnet.infura.io/'
@@ -78,6 +80,42 @@ const Portfolio: () => Node = () => {
         backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     };
 
+    const loadStorage = async () => {
+        let user_accountGet = await StorageHelper.getMySetting('user_account')
+        let user_privatekeyGet = await StorageHelper.getMySetting('user_privatekey')
+
+        if (user_accountGet || (user_accountGet !== '')) {
+            setAddress(user_accountGet)
+            setMyPrivateKey(user_privatekeyGet)
+        }
+    }
+
+    const saveToStorage = async (addressGet, privateKeyGet) => {
+        try {
+            await StorageHelper.setMySetting('user_account', addressGet)
+            await StorageHelper.setMySetting('user_privatekey', privateKeyGet)
+
+        } catch (err) {
+
+            console.log(err)
+            Alert.alert(
+                'saveToStorage 發生錯誤',
+                `${err} `,
+                [
+
+                    {
+                        text: 'OK', onPress: () => {
+                            // props.navigation.navigate('TestLoginScreen')
+                            console.log('OK Pressed')
+                        }
+                    },
+                ],
+                { cancelable: false }
+            );
+
+        }
+    }
+
     const createWallet = () => {
         let web3 = new Web3(Web3.givenProvider || new Web3.providers.HttpProvider(link));
         const newWallet = web3.eth.accounts.wallet.create(1);
@@ -86,6 +124,7 @@ const Portfolio: () => Node = () => {
 
         setAddress(newAccount.address)
         setMyPrivateKey(newAccount.privateKey)
+        saveToStorage(newAccount.address, newAccount.privateKey)
     }
 
     const walletBalance = () => {
@@ -95,8 +134,16 @@ const Portfolio: () => Node = () => {
     }
 
     useEffect(() => {
-        address == "" ? null : walletBalance()
-    })
+        const unsubscribe = props.navigation.addListener('focus', async () => {
+            console.log("有")
+            loadStorage()
+            address == "" ? null : walletBalance()
+        })
+
+        return () => {
+            unsubscribe
+        }
+    }, [address])
 
     return (
         <SafeAreaView style={backgroundStyle}>
@@ -126,7 +173,7 @@ const Portfolio: () => Node = () => {
                         right: 0,
                         justifyContent: 'center',//'space-between',
                         marginBottom: 70,
-                        marginTop: -100,
+                        marginTop: address === "" ? -60 : -100,
 
                     }}>
                         <Text style={[styles.buttonText, { color: '#00cccc' }]}>+</Text>
@@ -135,6 +182,18 @@ const Portfolio: () => Node = () => {
                     <Section title="Wallet Balance">
                         <Text style={styles.text}> {address === "" ? "no account" : balance + " ETH"}</Text>
                     </Section>
+                    <TouchableOpacity onPress={() => props.navigation.push('TransactionHistory', {})} style={{
+                        width: 300, height: 30, borderRadius: 14, borderWidth: 1, borderColor: '#00cccc',
+                        flexDirection: "row", flex: 1,
+                        left: 50,
+                        right: 0,
+                        justifyContent: 'center',//'space-between',
+                        marginTop: 20
+
+
+                    }}>
+                        <Text style={[styles.buttonText, { color: '#00cccc' }]}>History</Text>
+                    </TouchableOpacity>
 
                 </View>
             </ScrollView>
