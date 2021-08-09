@@ -123,7 +123,7 @@ const Send: () => Node = (props) => {
 
     }
 
-    const walletBalance = () => {
+    const walletBalance = (address) => {
         web3.eth.getBalance(address).then((result) => {
             // console.log("餘額？？!!!？", result) // '1000000000000000'
             let aaa = Web3.utils.fromWei(result, 'ether')
@@ -218,7 +218,7 @@ const Send: () => Node = (props) => {
         return () => {
             unsubscribe
         }
-    }, [address])
+    }, [balance])
 
     return (
         <SafeAreaView style={backgroundStyle}>
