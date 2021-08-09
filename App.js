@@ -95,21 +95,21 @@ const App: () => Node = () => {
     )
   }
 
-  function sendStack() {
-    return (
-      <Stack.Navigator
-        initialRouteName='Send'
-        screenOptions={{
-          headerStyle: { backgroundColor: '#00cccc' },
-          headerTintColor: 'white',
-          headerBackTitle: '返回',
-          headerShown: false
-        }}
-      >
-        <Stack.Screen name="Send" component={Send} />
-      </Stack.Navigator>
-    )
-  }
+  // function sendStack() {
+  //   return (
+  //     <Stack.Navigator
+  //       initialRouteName='Send'
+  //       screenOptions={{
+  //         headerStyle: { backgroundColor: '#00cccc' },
+  //         headerTintColor: 'white',
+  //         headerBackTitle: '返回',
+  //         headerShown: false
+  //       }}
+  //     >
+  //       <Stack.Screen name="Send" component={Send} />
+  //     </Stack.Navigator>
+  //   )
+  // }
 
 
   return (
@@ -140,7 +140,7 @@ const App: () => Node = () => {
         })}
       >
         <Tab.Screen name="Portfolio" component={portfolioStack} />
-        <Tab.Screen name="Send" component={sendStack} />
+        <Tab.Screen name="Send" component={Send} />
       </Tab.Navigator>
     </NavigationContainer>
 

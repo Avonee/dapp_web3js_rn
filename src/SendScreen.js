@@ -71,6 +71,7 @@ const Send: () => Node = (props) => {
     );
 
     const [address, setAddress] = useState("")
+    const [address2, setAddress2] = useState("")
     const [myPrivateKey, setMyPrivateKey] = useState("")
     const [balance, setBalance] = useState(0);
     const [otherAddress, setOtherAddress] = useState("");
@@ -85,15 +86,34 @@ const Send: () => Node = (props) => {
     };
 
     const loadStorage = async () => {
-        let user_accountGet = await StorageHelper.getMySetting('user_account')
-        let user_privatekeyGet = await StorageHelper.getMySetting('user_privatekey')
+        // let user_accountGet = await StorageHelper.getMySetting('user_account')
+        // let user_privatekeyGet = await StorageHelper.getMySetting('user_privatekey')
 
-        if (user_accountGet || (user_accountGet !== '')) {
-            setAddress(user_accountGet)
-            setMyPrivateKey(user_privatekeyGet)
+        // if (user_accountGet || (user_accountGet !== '')) {
+        //     setAddress(user_accountGet)
+        //     setMyPrivateKey(user_privatekeyGet)
+        // }
+
+        // console.log("拿到？", user_accountGet)
+
+        let user_ListsGet = await StorageHelper.getMySetting('user_wallet_lists')
+        let user_ListsGetParse = JSON.parse(user_ListsGet)
+
+        // take 1st address to send
+        if (user_ListsGetParse !== []) {
+            // console.log("1111111", user_ListsGetParse[0])
+            setAddress(user_ListsGetParse[0].user_account)
+            setMyPrivateKey(user_ListsGetParse[0].user_privatekey)
+
+            if (user_ListsGetParse.length >= 2) {
+                setAddress2(user_ListsGetParse[1].user_account)
+                setMyPrivateKey2(user_ListsGetParse[1].user_privatekey)
+
+            }
+
         }
 
-        console.log("拿到？", user_accountGet)
+
     }
 
     const walletBalance = () => {
@@ -142,8 +162,8 @@ const Send: () => Node = (props) => {
 
     useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', async () => {
-            console.log("!!!!!!!!!")
-            loadStorage()
+            // console.log("!!!!!!!!!")
+            await loadStorage()
             address == "" ? null : walletBalance()
         })
 
@@ -181,7 +201,9 @@ const Send: () => Node = (props) => {
                         <Text style={styles.text}>Network Fee</Text>
                         {/* choose high low  */}
                     </Section>
-                    <TextInput style={styles.inputText} placeholder="Recipient address" onChangeText={(otherAddress) => { setOtherAddress(otherAddress) }}></TextInput>
+                    {/* <TextInput style={styles.inputText} placeholder="Recipient address" onChangeText={(otherAddress) => { setOtherAddress(otherAddress) }}></TextInput> */}
+                    <TextInput style={styles.inputText} placeholder="Recipient address" value={address2}></TextInput>
+
                     <TextInput style={styles.inputText} placeholder="Amount" onChangeText={(value) => { setValue(value) }}></TextInput>
                     <TouchableOpacity style={[styles.sendButton, { marginLeft: 30 }]} onPress={() => { transferEth() }}>
                         <Text style={styles.buttonText}>交易ETH</Text>
