@@ -29,6 +29,8 @@ import {
     ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import { Picker } from '@react-native-picker/picker';
+
 import '../shim'
 import Web3 from 'web3';
 
@@ -62,6 +64,7 @@ const Section = ({ children, title }): Node => {
 
 const Send: () => Node = (props) => {
     const DEFAULT_WIDTH = Dimensions.get('window').width
+    const fetchGasPriceUrl = "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=YourApiKeyToken"
     const project_id = 'c4b99fb495c649eb941a34d91d8d7bd2'
     // const link = 'https://mainnet.infura.io/'
     // const link = `https://ropsten.infura.io/v3/${project_id}`
@@ -70,7 +73,8 @@ const Send: () => Node = (props) => {
     const web3 = new Web3(
         new Web3.providers.HttpProvider(link)
     );
-
+    const [fetchSelectedGasPrice, setFetchSelectedGasPrice] = useState([]);
+    const [selectedGasPrice, setSelectedGasPrice] = useState("choose below");
     const [address, setAddress] = useState("")
     const [address2, setAddress2] = useState("")
     const [myPrivateKey, setMyPrivateKey] = useState("")
@@ -78,7 +82,7 @@ const Send: () => Node = (props) => {
     // const [otherAddress, setOtherAddress] = useState("");
     const [value, setValue] = useState(0);
     const [hash, setHash] = useState("");
-    const [gasPriceGet, setGasPriceGet] = useState(0)
+    // const [gasPriceGet, setGasPriceGet] = useState(0)
 
     const isDarkMode = useColorScheme() === 'dark';
 
@@ -143,7 +147,7 @@ const Send: () => Node = (props) => {
             console.log("hexmoney: " + web3.utils.toHex(money));
 
             const txParams = {
-                gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei')),
+                gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei')),// TODO: selectedGasPrice //but no money so hard code temprary
                 gasLimit: web3.utils.toHex(21000),
                 to: address2,
                 from: address,
@@ -170,15 +174,44 @@ const Send: () => Node = (props) => {
         })
     }
 
+    const fetchGasPrice = async () => {
+        const options = {
+            method: 'GET',
+            // headers: {
+
+            // },
+
+        };
+
+        let response = await fetch(fetchGasPriceUrl, options)
+        if (response.status == 200) {
+            let responseData = await response.json()
+            if (responseData) {
+                // console.log("uuuuuuuuu!!!!!!",
+                //     responseData.result.SafeGasPrice,
+                //     responseData.result.ProposeGasPrice,
+                //     responseData.result.FastGasPrice
+                // )
+                setFetchSelectedGasPrice([responseData.result.FastGasPrice, responseData.result.ProposeGasPrice, responseData.result.SafeGasPrice])
+            }
+
+        } else {
+            console.log("fetch gas price err!!!")
+        }
+
+    }
+
     useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', async () => {
             // console.log("!!!!!!!!!")
 
-            gasprice = await web3.eth.getGasPrice()
-            let gaspriceConvert = Web3.utils.fromWei(gasprice, 'gwei')
-            // console.log("轉換後getGasPrice？", aaa)
-            setGasPriceGet(gaspriceConvert)
+            // gasprice = await web3.eth.getGasPrice()
+            // let gaspriceConvert = Web3.utils.fromWei(gasprice, 'gwei')
+            // // console.log("轉換後getGasPrice？", aaa)
+            // setGasPriceGet(gaspriceConvert)
 
+            // fetch gasPrice high low normal
+            await fetchGasPrice()
             await loadStorage()
         })
 
@@ -213,9 +246,20 @@ const Send: () => Node = (props) => {
                     </Section>
 
                     <Section title="Transaction">
-                        <Text style={styles.text}>Network Fee：{gasPriceGet} Gwei</Text>
-                        {/* choose high low  */}
+                        {/* <Text style={styles.text}>Network Fee：{gasPriceGet} Gwei</Text> */}
+                        <Text style={styles.text}>Network Fee：{selectedGasPrice} Gwei</Text>
                     </Section>
+
+                    <Picker
+                        selectedValue={selectedGasPrice}
+                        onValueChange={(itemValue, itemIndex) =>
+                            setSelectedGasPrice(itemValue)
+                        }>
+                        <Picker.Item label="High" value={fetchSelectedGasPrice[0]} />
+                        <Picker.Item label="Average" value={fetchSelectedGasPrice[1]} />
+                        <Picker.Item label="Low" value={fetchSelectedGasPrice[2]} />
+                    </Picker>
+
                     {/* <TextInput style={styles.inputText} placeholder="Recipient address" onChangeText={(otherAddress) => { setOtherAddress(otherAddress) }}></TextInput> */}
                     <TextInput style={styles.inputText} placeholder="Recipient address" value={address2}></TextInput>
 
