@@ -11,6 +11,7 @@
     "postinstall": "./node_modules/.bin/rn-nodeify --install 'crypto,buffer,react-native-randombytes,vm,stream,http,https,os,url,net,fs' --hack"
   },
   "dependencies": {
+    "@ethereumjs/tx": "^3.3.0",
     "@react-native-async-storage/async-storage": "^1.15.5",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/bottom-tabs": "^6.0.2",
@@ -25,6 +26,7 @@
     "constants-browserify": "^1.0.0",
     "dns.js": "^1.0.1",
     "domain-browser": "^1.2.0",
+    "ethereumjs-tx": "^2.1.2",
     "events": "^1.1.1",
     "https-browserify": "^0.0.1",
     "node-libs-browser": "^2.2.1",

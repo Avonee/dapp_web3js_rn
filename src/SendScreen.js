@@ -64,7 +64,8 @@ const Send: () => Node = (props) => {
     const DEFAULT_WIDTH = Dimensions.get('window').width
     const project_id = 'c4b99fb495c649eb941a34d91d8d7bd2'
     // const link = 'https://mainnet.infura.io/'
-    const link = `https://ropsten.infura.io/v3/${project_id}`
+    // const link = `https://ropsten.infura.io/v3/${project_id}`
+    const link = `https://rinkeby.infura.io/v3/${project_id}`
     const localhost_address = 'http://127.0.0.1:8545'//'http://localhost:8545'
     const web3 = new Web3(
         new Web3.providers.HttpProvider(link)
@@ -74,7 +75,7 @@ const Send: () => Node = (props) => {
     const [address2, setAddress2] = useState("")
     const [myPrivateKey, setMyPrivateKey] = useState("")
     const [balance, setBalance] = useState(0);
-    const [otherAddress, setOtherAddress] = useState("");
+    // const [otherAddress, setOtherAddress] = useState("");
     const [value, setValue] = useState(0);
     const [hash, setHash] = useState("");
 
@@ -107,7 +108,7 @@ const Send: () => Node = (props) => {
 
             if (user_ListsGetParse.length >= 2) {
                 setAddress2(user_ListsGetParse[1].user_account)
-                setMyPrivateKey2(user_ListsGetParse[1].user_privatekey)
+                // setMyPrivateKey2(user_ListsGetParse[1].user_privatekey)
 
             }
 
@@ -118,46 +119,53 @@ const Send: () => Node = (props) => {
 
     const walletBalance = () => {
         web3.eth.getBalance(address).then((result) => {
-            setBalance(Web3.utils.fromWei(result, 'ether'));
+            // console.log("餘額？？!!!？", result) // '1000000000000000'
+            let aaa = Web3.utils.fromWei(result, 'ether')
+            // console.log("轉換後？", aaa) // '0.001'
+            setBalance(aaa);
         })
     }
 
     const transferEth = () => {
-        // const Tx = require('ethereumjs-tx').Transaction
-        // const privateKey = Buffer.from(myPrivateKey, 'hex');
-        // web3.eth.getTransactionCount(address).then(_nonce => {
+        const Tx = require('ethereumjs-tx').Transaction
 
-        //   console.log("value: " + value);
-        //   console.log("text: " + otherAddress);
+        const privatekeyrModify = myPrivateKey.substring(2);
+        const privateKey = Buffer.from(privatekeyrModify, 'hex');
+        web3.eth.getTransactionCount(address).then(_nonce => {
 
-        //   const money = web3.utils.toWei(value.toString(), 'ether')
-        //   console.log("money: " + money);
-        //   console.log("hexmoney: " + web3.utils.toHex(money));
+            console.log("value: " + value);
+            console.log("text: " + address2);
 
-        //   const txParams = {
-        //     gasPrice: web3.utils.toHex(20000000000),
-        //     gasLimit: web3.utils.toHex(2300000),
-        //     to: otherAddress,
-        //     from: address,
-        //     nonce: web3.utils.toHex((_nonce)),
-        //     value: web3.utils.toHex(money)
-        //   };
+            const money = web3.utils.toWei(value.toString(), 'ether')
+            console.log("money: " + money);
+            console.log("hexmoney: " + web3.utils.toHex(money));
 
-        //   const tx = new Tx(txParams, { 'chain': 'ropsten' });
+            const txParams = {
+                gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei')),
+                gasLimit: web3.utils.toHex(21000),
+                to: address2,
+                from: address,
+                nonce: web3.utils.toHex((_nonce)),
+                value: web3.utils.toHex(money)
+            };
 
-        //   tx.sign(privateKey); // Transaction Signing here
+            // { 'chain': 'ropsten' }
+            // { 'chain': 'rinkeby' }
+            const tx = new Tx(txParams, { 'chain': 'rinkeby' });
 
-        //   const serializedTx = tx.serialize();
+            tx.sign(privateKey); // Transaction Signing here
 
-        //   web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).then((result) => {
-        //     console.log(result);
-        //     setHash(result.transactionHash);
+            const serializedTx = tx.serialize();
 
-        //   })
+            web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).then((result) => {
+                console.log(result);
+                setHash(result.transactionHash);
 
-        //   walletBalance()
+            })
 
-        // })
+            walletBalance()
+
+        })
     }
 
     useEffect(() => {
