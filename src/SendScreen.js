@@ -106,6 +106,8 @@ const Send: () => Node = (props) => {
             setAddress(user_ListsGetParse[0].user_account)
             setMyPrivateKey(user_ListsGetParse[0].user_privatekey)
 
+            walletBalance(user_ListsGetParse[0].user_account)
+
             if (user_ListsGetParse.length >= 2) {
                 setAddress2(user_ListsGetParse[1].user_account)
                 // setMyPrivateKey2(user_ListsGetParse[1].user_privatekey)
@@ -163,7 +165,7 @@ const Send: () => Node = (props) => {
 
             })
 
-            walletBalance()
+            walletBalance(address)
 
         })
     }
@@ -172,7 +174,6 @@ const Send: () => Node = (props) => {
         const unsubscribe = props.navigation.addListener('focus', async () => {
             // console.log("!!!!!!!!!")
             await loadStorage()
-            address == "" ? null : walletBalance()
         })
 
         return () => {

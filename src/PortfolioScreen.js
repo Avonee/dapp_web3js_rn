@@ -71,7 +71,8 @@ const Portfolio: () => Node = (props) => {
     const DEFAULT_WIDTH = Dimensions.get('window').width
     const project_id = 'c4b99fb495c649eb941a34d91d8d7bd2'
     // const link = 'https://mainnet.infura.io/'
-    const link = `https://ropsten.infura.io/v3/${project_id}`
+    // const link = `https://ropsten.infura.io/v3/${project_id}`
+    const link = `https://rinkeby.infura.io/v3/${project_id}`
     const localhost_address = 'http://127.0.0.1:8545'//'http://localhost:8545'
     const web3 = new Web3(
         new Web3.providers.HttpProvider(link)
@@ -117,11 +118,13 @@ const Portfolio: () => Node = (props) => {
                         "user_balance": aaa ?? 0
                     }]
 
-                    // TODO:
                     // newArray.push( )
                     newArray = newArray.concat(addOne)
                     // console.log("組合後？？？", newArray)
-                    setUserList(newArray)
+
+                    if (newArray.length === user_ListsGetParse.length) {
+                        setUserList(newArray)
+                    }
 
                 })
             })
