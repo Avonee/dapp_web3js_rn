@@ -78,7 +78,7 @@ const Send: () => Node = (props) => {
     // const [otherAddress, setOtherAddress] = useState("");
     const [value, setValue] = useState(0);
     const [hash, setHash] = useState("");
-
+    const [gasPriceGet, setGasPriceGet] = useState(0)
 
     const isDarkMode = useColorScheme() === 'dark';
 
@@ -173,6 +173,12 @@ const Send: () => Node = (props) => {
     useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', async () => {
             // console.log("!!!!!!!!!")
+
+            gasprice = await web3.eth.getGasPrice()
+            let gaspriceConvert = Web3.utils.fromWei(gasprice, 'gwei')
+            // console.log("轉換後getGasPrice？", aaa)
+            setGasPriceGet(gaspriceConvert)
+
             await loadStorage()
         })
 
@@ -207,7 +213,7 @@ const Send: () => Node = (props) => {
                     </Section>
 
                     <Section title="Transaction">
-                        <Text style={styles.text}>Network Fee</Text>
+                        <Text style={styles.text}>Network Fee：{gasPriceGet} Gwei</Text>
                         {/* choose high low  */}
                     </Section>
                     {/* <TextInput style={styles.inputText} placeholder="Recipient address" onChangeText={(otherAddress) => { setOtherAddress(otherAddress) }}></TextInput> */}
