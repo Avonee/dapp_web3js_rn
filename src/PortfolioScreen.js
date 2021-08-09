@@ -100,7 +100,6 @@ const Portfolio: () => Node = (props) => {
         //     setMyPrivateKey(user_privatekeyGet)
         // }
 
-
         if (user_ListsGetParse !== []) {
             let newArray = []
 
@@ -142,7 +141,7 @@ const Portfolio: () => Node = (props) => {
         if (addressGet !== '' && privateKeyGet !== '') {
 
             let addOne = [{
-                "id": (userList && userList.length === null || userList.length === 0 ? 0 : userList[userList.length - 1].id + 1),
+                "id": (userList && userList.length === null || userList.length === 0 ? 0 : userList.length),
                 "user_account": addressGet,
                 "user_privatekey": privateKeyGet ?? "",
                 // "user_balance": balanceGet ?? 0
